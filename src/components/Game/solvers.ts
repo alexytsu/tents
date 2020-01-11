@@ -41,19 +41,16 @@ export const getNeighbours = (
   row: number,
   col: number
 ): number => {
-  console.log("========");
   let count = -1;
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
       try {
-        console.log(grid[row][col]);
         if (grid[row + i][col + j] === "tent") {
           count++;
         }
       } catch (e) {}
     }
   }
-  console.log("========");
 
   return count;
 };
@@ -108,7 +105,7 @@ export const getNextIterGrids = (grid: GameGrid): GameGrid[] => {
   return newGrids;
 };
 
-const evaluateLoss = (
+export const evaluateLoss = (
   evalGrid: GameGrid,
   colConstraints: number[],
   rowConstraints: number[]
@@ -158,7 +155,10 @@ const evaluateLoss = (
   };
 };
 
-export const fixMostEgregiousTent = (gameBoard: GameBoard): GameBoard => {
+export const fixMostEgregiousTent = (
+  gameBoard: GameBoard,
+  previousGrids: string[]
+): GameBoard => {
   const newBoard = cloneDeep(gameBoard);
 
   const { rowConstraints, colConstraints, grid } = newBoard;
@@ -182,12 +182,24 @@ export const fixMostEgregiousTent = (gameBoard: GameBoard): GameBoard => {
     })
     .sort((a, b) => a.loss - b.loss);
 
-  const bestNextGrid = nextIterGridsEvaluated[0];
+  let bestNextBoard = nextIterGridsEvaluated[0];
+
+  for (let i = 0; i < nextIterGridsEvaluated.length; i++) {
+    const board = nextIterGridsEvaluated[i];
+    const gr = board.grid;
+    const gridString = JSON.stringify(gr);
+    const found = previousGrids.find(str => str === gridString);
+    if (found === undefined) {
+      bestNextBoard = nextIterGridsEvaluated[i];
+      break;
+    }
+  }
+
   console.log(
-    bestNextGrid.loss,
-    bestNextGrid.neighbourLoss,
-    bestNextGrid.constraintLoss
+    bestNextBoard.loss,
+    bestNextBoard.neighbourLoss,
+    bestNextBoard.constraintLoss
   );
 
-  return { ...gameBoard, grid: nextIterGridsEvaluated[1].grid };
+  return { ...gameBoard, grid: bestNextBoard.grid };
 };
