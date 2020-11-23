@@ -6,4 +6,5 @@ No two tents can be adjacent (8-adjacency) and tents cannot exist where trees ar
 
 ## Method
 
-A simple constraint satisfaction algorithm is used. At each timestep, the most optimal solution for the next step is greedily chosen. The algorithm cannot choose states it has already seen (they are serialised and cached) and therefore always makes progress even if it means a 'regression' in the completedeness heuristic. 
+A simple constraint satisfaction algorithm is used. At each iteration, the most optimal solution is greedily chosen. The algorithm does not choose states it has already seen (they are serialised and cached) and therefore always makes progress. 
+
